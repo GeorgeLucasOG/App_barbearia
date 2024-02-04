@@ -6,7 +6,6 @@ import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import Barbershopitem from "./_components/barbershop-item";
 import { Barbershop } from "@prisma/client";
-import Footer from "../_components/footer";
 
 export default async function Home(){
 
@@ -55,7 +54,6 @@ export default async function Home(){
                         ))}
                     </div>
                 </div>
-                <Footer />
             </div>
         );
 }
