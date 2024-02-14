@@ -7,7 +7,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { MenuIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
-import SideMenu from "./SideMenu";
+import SideMenu from "./sidemenu";
 
 
 const Header = () => {
