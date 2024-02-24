@@ -4,14 +4,32 @@ import { ptBR } from "date-fns/locale";
 import  Search  from "./_components/search";
 import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
-import Barbershopitem from "./_components/barbershop-item";
-import { Barbershop } from "@prisma/client";
+import BarbershopItem from "./_components/barbershop-item";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export default async function Home(){
 
-    //chama prisma e pega barbearias no banco de dados assegurando apenas uma conexão
-    const barbershops = await db.barbershop.findMany({})
+    const session = await getServerSession(authOptions);
 
+    const [barbershops, confirmedBookings] = await Promise.all([
+        db.barbershop.findMany({}),
+        session?.user
+        ? db.booking.findMany({
+            where:{
+                userId: (session.user as any).id,
+                date:{
+                    gte: new Date(),
+                },
+            },
+            include:{
+                service: true,
+                barbershop: true,
+            },
+        })
+        : Promise.resolve([]),
+    ]);
+    
 
     return(
             <div>
@@ -30,17 +48,26 @@ export default async function Home(){
                     <Search />
                 </div>
                 
-                {/* <div className="px-5 mt-6">
-                    <h2 className="text-xs mb-3 uppercase text-gray-400 font-bold">Agendamentos</h2>
-                    <BookingItem />
-                </div> */}
+                <div className="mt-6">
+                    {confirmedBookings.length > 0 && (
+                      <>
+                    <h2 className="pl-5 text-xs mb-3 uppercase text-gray-400 font-bold">Agendamentos</h2>
+
+                    <div className="px-5 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        {confirmedBookings.map((booking) => (
+                            <BookingItem key={booking.id} booking={booking} />
+                        ))}
+                    </div>
+                      </>  
+                    )}
+                </div>
 
                 <div className="mt-6">
                     <h2  className="px-5 text-xs mb-3 uppercase text-gray-400 font-bold">recomendados</h2>
                     
-                    <div className="flex px-5 gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                        {barbershops.map((barbershop: Barbershop) => (
-                            <Barbershopitem key={barbershop.id} barbershop={barbershop} />
+                    <div className="px-5 flex gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        {barbershops.map((barbershop) => (
+                            <BarbershopItem key={barbershop.id} barbershop={barbershop} />
                         ))}
                     </div>
                 </div>
@@ -49,8 +76,8 @@ export default async function Home(){
                     <h2  className="px-5 text-xs mb-3 uppercase text-gray-400 font-bold">Populares</h2>
                     
                     <div className="flex px-5 gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-                        {barbershops.map((barbershop: Barbershop) => (
-                            <Barbershopitem key={barbershop.id} barbershop={barbershop} />
+                        {barbershops.map((barbershop) => (
+                            <BarbershopItem key={barbershop.id} barbershop={barbershop} />
                         ))}
                     </div>
                 </div>

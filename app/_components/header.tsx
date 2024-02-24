@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { MenuIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-
+import Link from "next/link";
 import SideMenu from "./sidemenu";
 
 
@@ -21,7 +21,9 @@ const Header = () => {
     return ( 
         <Card>
             <CardContent className="p-5 justify-between items-center flex flex-row">
-              <Image src="/logo.png" alt="FSW Barbar" height={22} width={ 120 }   />
+                <Link href="/">
+                    <Image src="/logo.png" alt="FSW Barbar" height={22} width={ 120 }   />
+                </Link>
                 <Sheet>
                     <SheetTrigger asChild>
                         <Button variant={"outline"} size={"icon"}>
